@@ -27,10 +27,42 @@ def dodaj_drink_skladnik(drink_id, ingredient_id, amount):
     conn.close()
 # Przykładowe dodawanie drinka i składników
 dodaj_drink("Mojito")
+dodaj_drink("Whisky z Colą")
+dodaj_drink("Wódka z Colą")
+dodaj_drink("Gin z Tonikiem")
+dodaj_drink("Sex on the Beach")
+
+
+
 dodaj_skladnik("Rum", 50)
 dodaj_skladnik("Mięta", 30)
+dodaj_skladnik("Whisky", 100)
+dodaj_skladnik("Cola", 200)
+dodaj_skladnik("Wódka", 100)
+dodaj_skladnik("Gin", 100)
+dodaj_skladnik("Tonik", 200)
+dodaj_skladnik("Sok pomarańczowy", 150)
+dodaj_skladnik("Grenadyna", 50)
 
 # Załóżmy, że drink_id = 1, składnik_id = 1 i 2
+# Whisky z Colą
+dodaj_drink_skladnik(1, 1, 100)  # Whisky
+dodaj_drink_skladnik(1, 2, 200)  # Cola
+
+# Wódka z Colą
+dodaj_drink_skladnik(2, 3, 100)  # Wódka
+dodaj_drink_skladnik(2, 2, 200)  # Cola
+
+# Gin z Tonikiem
+dodaj_drink_skladnik(3, 4, 100)  # Gin
+dodaj_drink_skladnik(3, 5, 200)  # Tonik
+
+# Sex on the Beach
+dodaj_drink_skladnik(4, 3, 100)  # Wódka
+dodaj_drink_skladnik(4, 6, 150)  # Sok pomarańczowy
+dodaj_drink_skladnik(4, 7, 50)   # Grenadyna
+
+#Mohito
 dodaj_drink_skladnik(1, 1, 50)  # Dodanie rumu do mojito
 dodaj_drink_skladnik(1, 2, 30)  # Dodanie mięty do mojito
 # Konfiguracja GPIO
