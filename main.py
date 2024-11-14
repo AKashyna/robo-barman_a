@@ -4,7 +4,35 @@ from flask import Flask, render_template
 import plotly.graph_objects as go
 import plotly.io as pio
 import threading
+import sqlite3
+def dodaj_drink(name):
+    conn = sqlite3.connect('drinks.db')
+    cursor = conn.cursor()
+    cursor.execute("INSERT INTO drink (name) VALUES (?)", (name,))
+    conn.commit()
+    conn.close()
 
+def dodaj_skladnik(name, quantity):
+    conn = sqlite3.connect('drinks.db')
+    cursor = conn.cursor()
+    cursor.execute("INSERT INTO ingredient (name, quantity) VALUES (?, ?)", (name, quantity))
+    conn.commit()
+    conn.close()
+
+def dodaj_drink_skladnik(drink_id, ingredient_id, amount):
+    conn = sqlite3.connect('drinks.db')
+    cursor = conn.cursor()
+    cursor.execute("INSERT INTO drink_ingredient (drink_id, ingredient_id, amount) VALUES (?, ?, ?)", (drink_id, ingredient_id, amount))
+    conn.commit()
+    conn.close()
+# Przykładowe dodawanie drinka i składników
+dodaj_drink("Mojito")
+dodaj_skladnik("Rum", 50)
+dodaj_skladnik("Mięta", 30)
+
+# Załóżmy, że drink_id = 1, składnik_id = 1 i 2
+dodaj_drink_skladnik(1, 1, 50)  # Dodanie rumu do mojito
+dodaj_drink_skladnik(1, 2, 30)  # Dodanie mięty do mojito
 # Konfiguracja GPIO
 pins = [10, 11, 2, 3, 4, 5, 6, 7]  # GPIO piny dla pomp
 flow_rates = [10] * len(pins)  # Przepływ (ml/s) dla każdej pompy
