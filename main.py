@@ -32,8 +32,6 @@ dodaj_drink("Wódka z Colą")
 dodaj_drink("Gin z Tonikiem")
 dodaj_drink("Sex on the Beach")
 
-
-
 dodaj_skladnik("Rum", 50)
 dodaj_skladnik("Mięta", 30)
 dodaj_skladnik("Whisky", 100)
@@ -74,6 +72,24 @@ GPIO.setmode(GPIO.BCM)
 for pin in pins:
     GPIO.setup(pin, GPIO.OUT)
     GPIO.output(pin, GPIO.HIGH)
+
+
+def get_motor_pin_for_ingredient(ingredient_name):
+    ingredient_to_motor_map = {
+        "Whisky": 0,  
+        "Cola": 1,    
+        "Wódka": 2,   
+        "Gin": 3,     
+        "Tonik": 4,   
+        "Sok pomarańczowy": 5, 
+        "Grenadyna": 6,  
+        "Mięta":7,
+        "Rum":8
+    }
+    return ingredient_to_motor_map.get(ingredient_name, -1) 
+
+
+
 
 def run_pump(pin_index, duration):
     """
