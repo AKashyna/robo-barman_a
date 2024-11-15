@@ -5,10 +5,9 @@ from flask import Flask, request, redirect, url_for
 import plotly.graph_objects as go
 import plotly.io as pio
 
-
 # Konfiguracja GPIO
 pins = [10, 11, 2, 3, 4, 5, 6, 7]  # GPIO piny dla pomp
-flow_rate = 100 #4.17  # Przepływ (ml/s)
+flow_rate = 100  # 4.17  # Przepływ (ml/s)
 fluid_data = [0] * len(pins)  # Przelana ilość płynu dla każdej pompy
 
 GPIO.setmode(GPIO.BCM)
@@ -18,34 +17,34 @@ for pin in pins:
 
 # Mapowanie składników na piny pomp
 ingredient_to_motor_map = {
-    "Whisky": 0,
-    "Cola": 1,
-    "Wódka": 2,
-    "Gin": 3,
-    "Tonik": 4,
-    "Sok pomarańczowy": 5,
-    "Grenadyna": 6,
-    "Rum":7
+    "Whisky": 0, #10
+    "Cola": 1, #11
+    "Wódka": 2, #2
+    "Gin": 3, #3
+    "Tonik": 4, #4
+    "Sok pomarańczowy": 5, #5
+    "Grenadyna": 6, #6
+    "Rum": 7 #7
 }
 
 # Funkcje do obsługi pomp
-def run_pump(pin_index, duration):
-    GPIO.output(pins[pin_index], GPIO.LOW)
-    time.sleep(duration)
-    GPIO.output(pins[pin_index], GPIO.HIGH)
-    fluid_data[pin_index] += flow_rate * duration
+def run_pump(pin, work_time):
+    GPIO.output(pins[pin], GPIO.LOW)
+    time.sleep(work_time)
+    GPIO.output(pins[pin], GPIO.HIGH)
+    fluid_data[pin] += flow_rate * work_time
 
-def make_drink(drink_id):
-     with sqlite3.connect('drinks.db') as conn:
+def make_drink(drink):
+    with sqlite3.connect('drinks.db') as conn:
         cursor = conn.cursor()
         cursor.execute("""
             SELECT ingredient.name, drink_ingredient.amount, ingredient.quantity  
             FROM drink_ingredient
             JOIN ingredient ON drink_ingredient.ingredient_id = ingredient.id
             WHERE drink_ingredient.drink_id = ?
-        """, (drink_id,))
+        """, (drink,))
         ingredients = cursor.fetchall()
-        
+
         for ingredient, amount, quantity in ingredients:
             if quantity < amount:
                 raise ValueError(f"Brak wystarczającej ilości składnika: {ingredient}")
@@ -55,10 +54,10 @@ def make_drink(drink_id):
             if motor_index is not None:
                 run_pump(motor_index, amount / flow_rate)
             cursor.execute("UPDATE ingredient SET quantity = quantity - ? WHERE name = ?", (amount, ingredient))
-           
-        cursor.execute("INSERT INTO drink_statistics (drink_id) VALUES (?)", (drink_id,))
+
+        cursor.execute("INSERT INTO order_history (drink_id) VALUES (?)", (drink,))
         conn.commit()
-    
+
 
 # Flask aplikacja
 app = Flask(__name__)
@@ -66,9 +65,9 @@ app = Flask(__name__)
 @app.route("/", methods=["GET", "POST"])
 def index():
     if request.method == "POST":
-        drink_id = int(request.form.get("drink_id"))
+        drink = int(request.form.get("drink_id"))
         try:
-            make_drink(drink_id)
+            make_drink(drink)
         except ValueError as e:
             return str(e)
         return redirect(url_for("index"))
@@ -79,16 +78,16 @@ def index():
     cursor.execute("SELECT id, name FROM drink")
     drinks = cursor.fetchall()
     cursor.execute("""
-        SELECT drink.name, COUNT(drink_statistics.drink_id) as count
-        FROM drink_statistics
-        JOIN drink ON drink_statistics.drink_id = drink.id
+        SELECT drink.name, COUNT(order_history.drink_id) as count
+        FROM order_history
+        JOIN drink ON order_history.drink_id = drink.id
         GROUP BY drink.id
         ORDER BY count DESC
     """)
     drink_stats = cursor.fetchall()
     drink_names = [row[0] for row in drink_stats]
     drink_counts = [row[1] for row in drink_stats]
-    
+
     fig1 = go.Figure()
     fig1.add_trace(go.Bar(x=drink_names, y=drink_counts, name="Najczęściej robione drinki"))
     fig1.update_layout(title="Statystyka najczęściej robionych drinków", xaxis_title="Drink", yaxis_title="Ilość")
@@ -105,7 +104,7 @@ def index():
 
     conn.close()
 
-#wykres 3
+    # wykres 3
     fig = go.Figure()
     fig.add_trace(go.Bar(x=[f"{i}" for i, j in ingredient_to_motor_map.items()],
                          y=fluid_data,
@@ -113,7 +112,7 @@ def index():
     fig.update_layout(title="Ilość przelanego płynu przez pompy",
                       xaxis_title="Składnik",
                       yaxis_title="Przepompowana ilość płynu (ml)")
-    
+
     graph_html = pio.to_html(fig, full_html=False)
     graph_html1 = pio.to_html(fig1, full_html=False)
     graph_html2 = pio.to_html(fig2, full_html=False)
