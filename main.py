@@ -17,14 +17,14 @@ for pin in pins:
 
 # Mapowanie składników na piny pomp
 ingredient_to_motor_map = {
-    "Whisky": 0, #10
-    "Cola": 1, #11
-    "Wódka": 2, #2
-    "Gin": 3, #3
-    "Tonik": 4, #4
-    "Sok pomarańczowy": 5, #5
-    "Grenadyna": 6, #6
-    "Rum": 7 #7
+    "wódka": 0, #10
+    "rum": 1, #11
+    "sok pomarańczowy": 2, #2
+    "sok żurawinowy": 3, #3
+    "sok limonkowy": 4, #4
+    "sok ananasowy": 5, #5
+    "sprite": 6, #6
+    "curacao":7 #7
 }
 
 # Funkcje do obsługi pomp
