@@ -52,69 +52,116 @@ def initialize_database():
     def dodaj_drink_skladnik(drink_id, ingredient_id, amount):
         cursor.execute("INSERT INTO drink_ingredient (drink_id, ingredient_id, amount) VALUES (?, ?, ?)", (drink_id, ingredient_id, amount))
         
-    # Dodawanie drinków
-    dodaj_drink("Mojito")
-    dodaj_drink("Whisky z Colą")
-    dodaj_drink("Wódka z Colą")
-    dodaj_drink("Gin z Tonikiem")
-    dodaj_drink("Sex on the Beach")
-
+    '''   
     1. Sex on the Beach
-40 ml wódki
-50 ml soku pomarańczowego
-50 ml soku żurawinowego
+60 ml wódki
+70 ml soku pomarańczowego
+70 ml soku żurawinowego
+50 ml soku ananasowego
 
     2. Mai Tai
-60 ml jasnego rumu
-20 ml soku z limonki
-50 ml sok pomarańczowy
-sok ananasowy?  
+90 ml jasnego rumu
+40 ml soku z limonki
+80 ml sok pomarańczowy
+40 ml sok ananasowy
 
     3. Mojito
-40 ml jasnego rumu
-20 ml soku z limonki
-100 ml sprite
+70 ml jasnego rumu
+30 ml soku z limonki
+150 ml sprite
 
     4. Cosmopolitan
-40 ml wódki
-15 ml soku pomarańczowego
-15 ml soku żurawinowego
-10 ml soku z limonki
+70 ml wódki
+70 ml soku pomarańczowego
+70 ml soku żurawinowego
+40 ml soku z limonki
 
-    5. Tom Collins/Gin Fizz
-50 ml gin
-20 ml sok z limonki
-30 ml sprite
+    5. Blue Lagoon
+65 ml rum
+35 ml curacao
+150 ml sprite
 
-    wódka
-    rum
-    gin
-    sok pomarańczowy
-    sok żurawinowy
-    sok limonkowy
-    sprite
+    6. kamikadze
+70 ml wodka
+90 ml curacao
+90 ml sok limonkowy
+
+    7. Tropical Fire
+100 ml rum
+75 ml sok żurawinowy
+75 ml sok ananasowy
+    
+    8. THE END
+50 ml wódka
+50 ml rum
+
+Składniki:
+    1 wódka
+    2 rum
+    3 sok pomarańczowy
+    4 sok żurawinowy
+    5 sok limonkowy
+    6 sok ananasowy
+    7 sprite
+    8 curacao
+    '''
+    # Dodawanie drinków
+    dodaj_drink("Sex on the Beach")
+    dodaj_drink("Mai Tai")
+    dodaj_drink("Mojito")
+    dodaj_drink("Gin z Tonikiem")
+    dodaj_drink("Cosmopolitan")
+    dodaj_drink("Blue Lagoon")
+    dodaj_drink("kamikadze")
+    dodaj_drink("Tropical Fire")
+    dodaj_drink("THE END")
 
     # Dodawanie składników
-    dodaj_skladnik("Rum", 1500)
-    dodaj_skladnik("Whisky", 1500)
-    dodaj_skladnik("Cola", 1500)
-    dodaj_skladnik("Wódka", 1500)
-    dodaj_skladnik("Gin", 1500)
-    dodaj_skladnik("Tonik", 1500)
-    dodaj_skladnik("Sok pomarańczowy", 2000)
-    dodaj_skladnik("Grenadyna", 1500)
+    dodaj_skladnik("wódka", 1000)
+    dodaj_skladnik("rum", 1000)
+    dodaj_skladnik("sok pomarańczowy", 1000)
+    dodaj_skladnik("sok żurawinowy", 1000)
+    dodaj_skladnik("sok limonkowy", 1000)
+    dodaj_skladnik("sok ananasowy", 1000)
+    dodaj_skladnik("sprite", 2000)
+    dodaj_skladnik("curacao", 490)
 
     # Przypisywanie składników do drinków
-    dodaj_drink_skladnik(2, 1, 100)  
-    dodaj_drink_skladnik(2, 2, 200)  
-    dodaj_drink_skladnik(3, 3, 100)  
-    dodaj_drink_skladnik(3, 2, 200)  
-    dodaj_drink_skladnik(4, 4, 100)  
-    dodaj_drink_skladnik(4, 5, 200)  
-    dodaj_drink_skladnik(5, 3, 100)  
-    dodaj_drink_skladnik(5, 6, 150) 
-    dodaj_drink_skladnik(5, 7, 50)   
-    dodaj_drink_skladnik(1, 1, 50)   
+        #1. Sex on the Beach
+    dodaj_drink_skladnik(1, 1, 60)
+    dodaj_drink_skladnik(1, 3, 70)
+    dodaj_drink_skladnik(1, 4, 70)
+    dodaj_drink_skladnik(1, 6, 50)
+        #2. Mai Tai
+    dodaj_drink_skladnik(2, 2, 90)
+    dodaj_drink_skladnik(2, 5, 40)
+    dodaj_drink_skladnik(2, 3, 80)
+    dodaj_drink_skladnik(2, 6, 40)
+        #3. Mojito
+    dodaj_drink_skladnik(3, 2, 70)
+    dodaj_drink_skladnik(3, 5, 30)
+    dodaj_drink_skladnik(3, 7, 150)
+        #4. Cosmopolitan
+    dodaj_drink_skladnik(4, 1, 70)
+    dodaj_drink_skladnik(4, 3, 70)
+    dodaj_drink_skladnik(4, 4, 70)
+    dodaj_drink_skladnik(4, 5, 40)
+        #5. Blue Lagoon
+    dodaj_drink_skladnik(5, 2, 65)
+    dodaj_drink_skladnik(5, 8, 35)
+    dodaj_drink_skladnik(5, 7, 150)
+        #6. Kamikadze
+    dodaj_drink_skladnik(6, 1, 70)
+    dodaj_drink_skladnik(6, 8, 90)
+    dodaj_drink_skladnik(6, 5, 90)
+        #7. Tropical Fire
+    dodaj_drink_skladnik(7, 2, 100)
+    dodaj_drink_skladnik(7, 4, 75)
+    dodaj_drink_skladnik(7, 6, 75)
+        #8. THE END
+    dodaj_drink_skladnik(8, 1, 50)
+    dodaj_drink_skladnik(8, 2, 50)
+
 
     # Zatwierdzenie zmian i zamknięcie połączenia
     conn.commit()
@@ -123,4 +170,3 @@ sok ananasowy?
 
 if __name__ == "__main__": 
     initialize_database()
-
