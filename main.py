@@ -4,6 +4,10 @@ import sqlite3
 from flask import Flask, request, redirect, url_for
 import plotly.graph_objects as go
 import plotly.io as pio
+import board
+import busio
+from adafruit_character_lcd.character_lcd_i2c import Character_LCD_I2C
+
 
 # Konfiguracja GPIO
 pins = [10, 11, 2, 3, 4, 5, 6, 7]  # GPIO piny dla pomp
@@ -27,6 +31,13 @@ ingredient_to_motor_map = {
     "curacao":7 #7
 }
 
+# Konfiguracja LCD
+i2c = busio.I2C(board.SCL, board.SDA)
+lcd_columns = 20
+lcd_rows = 4
+lcd = Character_LCD_I2C(i2c, lcd_columns, lcd_rows)
+lcd.clear()
+
 # Funkcje do obsługi pomp
 def run_pump(pin, work_time):
     GPIO.output(pins[pin], GPIO.LOW)
@@ -47,6 +58,10 @@ def make_drink(drink):
 
         for ingredient, amount, quantity in ingredients:
             if quantity < amount:
+                message = f"Brak {ingredient}\n"
+                lcd.message = message
+                time.sleep(5)
+                lcd.clear()
                 raise ValueError(f"Brak wystarczającej ilości składnika: {ingredient}")
 
         for ingredient, amount, quantity in ingredients:
