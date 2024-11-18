@@ -4,10 +4,6 @@ import sqlite3
 from flask import Flask, request, redirect, url_for
 import plotly.graph_objects as go
 import plotly.io as pio
-import board
-import busio
-from adafruit_character_lcd.character_lcd_i2c import Character_LCD_I2C
-
 
 # Konfiguracja GPIO
 pins = [10, 11, 2, 3, 4, 5, 6, 7]  # GPIO piny dla pomp
@@ -21,22 +17,15 @@ for pin in pins:
 
 # Mapowanie składników na piny pomp
 ingredient_to_motor_map = {
-    "wódka": 0, #10
-    "rum": 1, #11
-    "sok pomarańczowy": 2, #2
-    "sok żurawinowy": 3, #3
-    "sok limonkowy": 4, #4
-    "sok ananasowy": 5, #5
-    "sprite": 6, #6
-    "curacao":7 #7
+    "wódka": 0,  # 10
+    "rum": 1,  # 11
+    "sok pomarańczowy": 2,  # 2
+    "sok żurawinowy": 3,  # 3
+    "sok limonkowy": 4,  # 4
+    "sok ananasowy": 5,  # 5
+    "sprite": 6,  # 6
+    "curacao": 7  # 7
 }
-
-# Konfiguracja LCD
-i2c = busio.I2C(board.SCL, board.SDA)
-lcd_columns = 20
-lcd_rows = 4
-lcd = Character_LCD_I2C(i2c, lcd_columns, lcd_rows)
-lcd.clear()
 
 # Funkcje do obsługi pomp
 def run_pump(pin, work_time):
@@ -46,6 +35,7 @@ def run_pump(pin, work_time):
     fluid_data[pin] += flow_rate * work_time
 
 def make_drink(drink):
+    missing_ingredients = []
     with sqlite3.connect('drinks.db') as conn:
         cursor = conn.cursor()
         cursor.execute("""
@@ -56,14 +46,16 @@ def make_drink(drink):
         """, (drink,))
         ingredients = cursor.fetchall()
 
+        # Sprawdzamy, czy składniki są wystarczające
         for ingredient, amount, quantity in ingredients:
             if quantity < amount:
-                message = f"Brak {ingredient}\n"
-                lcd.message = message
-                time.sleep(5)
-                lcd.clear()
-                raise ValueError(f"Brak wystarczającej ilości składnika: {ingredient}")
+                missing_ingredients.append((ingredient, amount - quantity))
 
+        # Jeśli brakuje składników, zwracamy listę braków
+        if missing_ingredients:
+            return missing_ingredients
+
+        # Jeśli składniki są dostępne, wykonujemy drink
         for ingredient, amount, quantity in ingredients:
             motor_index = ingredient_to_motor_map.get(ingredient)
             if motor_index is not None:
@@ -72,21 +64,59 @@ def make_drink(drink):
 
         cursor.execute("INSERT INTO order_history (drink_id) VALUES (?)", (drink,))
         conn.commit()
-
+    return None
 
 # Flask aplikacja
 app = Flask(__name__)
 
+@app.route("/missing", methods=["GET", "POST"])
+def missing():
+    missing_ingredients = request.args.get("missing", "").split(",")  # Pobieramy brakujące składniki
+    if request.method == "POST":
+        ingredient_name = request.form.get("ingredient_name")
+        ingredient_amount = int(request.form.get("ingredient_amount"))
+        if ingredient_name and ingredient_amount > 0:
+            with sqlite3.connect('drinks.db') as conn:
+                cursor = conn.cursor()
+                # Dodajemy brakujące składniki
+                cursor.execute("UPDATE ingredient SET quantity = quantity + ? WHERE name = ?", (ingredient_amount, ingredient_name))
+                conn.commit()
+            return redirect(url_for("index"))
+    return f"""
+    <html>
+        <head>
+            <title>Brakujące składniki</title>
+        </head>
+        <body>
+            <h1>Brakuje składników</h1>
+            <ul>
+                {''.join([f"<li>{ingredient}</li>" for ingredient in missing_ingredients if ingredient])}
+            </ul>
+            <h2>Uzupełnij składniki</h2>
+            <form method="POST">
+                <label for="ingredient_name">Nazwa składnika:</label>
+                <input type="text" name="ingredient_name" id="ingredient_name" required>
+                <label for="ingredient_amount">Ilość (ml):</label>
+                <input type="number" name="ingredient_amount" id="ingredient_amount" min="1" required>
+                <button type="submit">Uzupełnij</button>
+            </form>
+            <a href="/">Powrót</a>
+        </body>
+    </html>
+    """
+
 @app.route("/", methods=["GET", "POST"])
 def index():
-    if request.method == "POST":
+    if request.method == "POST" and "drink_id" in request.form:
         drink = int(request.form.get("drink_id"))
-        try:
-            make_drink(drink)
-        except ValueError as e:
-            return str(e)
-        return redirect(url_for("index"))
-
+        missing_ingredients = make_drink(drink)
+        if missing_ingredients:
+            # Przekierowanie do nowego okna z brakującymi składnikami
+            missing_names = [ingredient for ingredient, _ in missing_ingredients]
+            return redirect(url_for("missing", missing=",".join(missing_names)))
+        else:
+            return redirect(url_for("index"))
+    
     # Pobieranie listy drinków
     conn = sqlite3.connect('drinks.db')
     cursor = conn.cursor()
