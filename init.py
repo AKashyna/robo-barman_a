@@ -109,7 +109,6 @@ Składniki:
     dodaj_drink("Sex on the Beach")
     dodaj_drink("Mai Tai")
     dodaj_drink("Mojito")
-    dodaj_drink("Gin z Tonikiem")
     dodaj_drink("Cosmopolitan")
     dodaj_drink("Blue Lagoon")
     dodaj_drink("kamikadze")
