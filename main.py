@@ -87,7 +87,7 @@ def missing():
             with sqlite3.connect('drinks.db') as conn:
                 cursor = conn.cursor()
                 # Dodajemy brakujące składniki
-                cursor.execute("UPDATE ingredient SET quantity = quantity + ? WHERE name = ?", (ingredient_amount, ingredient_name))
+                cursor.execute("UPDATE ingredient SET quantity = ? WHERE name = ?", (ingredient_amount, ingredient_name))
                 conn.commit()
             return redirect(url_for("index"))
     return f"""
