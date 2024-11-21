@@ -65,13 +65,21 @@ def make_drink(drink):
         cursor.execute("INSERT INTO order_history (drink_id) VALUES (?)", (drink,))
         conn.commit()
     return None
-
+#Pobranie nazw do selecta
+def get_ingredients():
+    with sqlite3.connect('drinks.db') as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT name FROM ingredient")  
+        ingredients = cursor.fetchall()
+    return [ingredient[0] for ingredient in ingredients]
+    
 # Flask aplikacja
 app = Flask(__name__)
 
 @app.route("/missing", methods=["GET", "POST"])
 def missing():
     missing_ingredients = request.args.get("missing", "").split(",")  # Pobieramy brakujące składniki
+    available_ingredients = get_ingredients()
     if request.method == "POST":
         ingredient_name = request.form.get("ingredient_name")
         ingredient_amount = int(request.form.get("ingredient_amount"))
@@ -94,8 +102,10 @@ def missing():
             </ul>
             <h2>Uzupełnij składniki</h2>
             <form method="POST">
-                <label for="ingredient_name">Nazwa składnika:</label>
-                <input type="text" name="ingredient_name" id="ingredient_name" required>
+                <label for="ingredient_name">Wybierz składnik:</label>
+                <select name="ingredient_name" id="ingredient_name" required>
+                    {"".join([f"<option value='{ingredient}'>{ingredient}</option>" for ingredient in available_ingredients])}
+                </select>
                 <label for="ingredient_amount">Ilość (ml):</label>
                 <input type="number" name="ingredient_amount" id="ingredient_amount" min="1" required>
                 <button type="submit">Uzupełnij</button>
