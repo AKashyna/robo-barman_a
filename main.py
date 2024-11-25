@@ -94,10 +94,8 @@ def missing():
             </ul>
             <h2>Uzupełnij składniki</h2>
             <form method="POST">
-                <label for="ingredient_name">Wybierz składnik:</label>
-                <select name="ingredient_name" id="ingredient_name" required>
-                    {"".join([f"<option value='{ingredient}'>{ingredient}</option>" for ingredient in available_ingredients])}
-                </select>
+                <label for="ingredient_name">Nazwa składnika:</label>
+                <input type="text" name="ingredient_name" id="ingredient_name" required>
                 <label for="ingredient_amount">Ilość (ml):</label>
                 <input type="number" name="ingredient_amount" id="ingredient_amount" min="1" required>
                 <button type="submit">Uzupełnij</button>
