@@ -65,21 +65,13 @@ def make_drink(drink):
         cursor.execute("INSERT INTO order_history (drink_id) VALUES (?)", (drink,))
         conn.commit()
     return None
-#Pobranie nazw do selecta
-def get_ingredients():
-    with sqlite3.connect('drinks.db') as conn:
-        cursor = conn.cursor()
-        cursor.execute("SELECT name FROM ingredient")  
-        ingredients = cursor.fetchall()
-    return [ingredient[0] for ingredient in ingredients]
-    
+
 # Flask aplikacja
 app = Flask(__name__)
 
 @app.route("/missing", methods=["GET", "POST"])
 def missing():
     missing_ingredients = request.args.get("missing", "").split(",")  # Pobieramy brakujące składniki
-    available_ingredients = get_ingredients()
     if request.method == "POST":
         ingredient_name = request.form.get("ingredient_name")
         ingredient_amount = int(request.form.get("ingredient_amount"))
